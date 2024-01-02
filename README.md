@@ -1,5 +1,3 @@
-# WIP - not working yet
-
 # Tidy Desktop
 
 Very simple job to move Desktop files to `old` folder. 
