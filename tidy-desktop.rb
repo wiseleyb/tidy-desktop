@@ -5,15 +5,16 @@ include FileUtils
 
 desktop = 'Desktop'
 ls_pattern = '*.*'
-old_dir_name = 'old2'
 t = Time.now.strftime('%Y%m%d_%I%M%S')
+debug = true
+old_dir_name = debug ? 'old2' : 'old'
 
 desktop_dir = File.join(File.expand_path('~'), desktop)
 old_dir = File.join(desktop_dir, old_dir_name)
 mkdir_p(old_dir)
 
 # debug
-touch File.join(desktop_dir, "aaa-#{t}.txt")
+touch File.join(desktop_dir, "aaa-#{t}.txt") if debug
 
 files = Dir[File.join(desktop_dir, ls_pattern)]
 files.each do |file|
@@ -26,7 +27,11 @@ files.each do |file|
       File.join(old_dir,
                 "#{fname_no_ext}-#{t}#{File.extname(fname)}")
   end
-  mv(file, fdest)
+  if debug
+    cp(file, fdest)
+  else
+    mv(file, fdest)
+  end
   puts fdest
 end
 

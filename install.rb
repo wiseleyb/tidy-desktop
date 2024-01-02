@@ -12,7 +12,7 @@ def shell(cmd)
 end
 
 def shell_sudo(cmd)
-  shell("sudo #{cmd}")
+  shell("sudo -E #{cmd}")
 end
 
 run_every_min = 1

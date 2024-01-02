@@ -7,8 +7,9 @@ Very simple job to move Desktop files to `old` folder.
 ```
 git clone ...
 cd ...
-chmod +x install.rb
+chmod a+x install.rb
 sudo ./install.rb
+sudo -E `asdf which ruby` install.rb
 ```
 
 # Turning on/off
