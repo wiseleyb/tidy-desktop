@@ -1,8 +1,13 @@
 # Tidy Desktop
 
-Very simple job to move Desktop files to `old` folder. 
+Very simple job to move Desktop files to `old` folder. This will move files
+(not folders) older than 30 minutes to a desktop folder
+`old/tidy-desktop-yyyy-mm-dd`
 
 # Crontab
+
+Tested on a Mac. Should only require very basic Ruby (so any version). You'll
+need to change some paths until I write an installer.
 
 ```
 git clone https://github.com/wiseleyb/tidy-desktop
