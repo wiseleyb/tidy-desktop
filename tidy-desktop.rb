@@ -1,43 +1,53 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # chmod a+x tidy-desktop.rb
+require 'yaml'
 require 'fileutils'
-include FileUtils
+require_relative 'Config'
 
-require '/Users/benwiseley/dev/tidy-desktop//tidy_desktop_vars'
-include TidyDesktopVars
+# Moves files from desktop to and "old" folder. Meant to be used in cron
+class TidyDesktop
+  def self.run!
+    config = Config.new(config_file: ARGV[0] || 'config.yml')
 
-# create old and old yyyy-mm-dd folder if they don't exist
-mkdir_p(OLD_DIR)
+    # create old and old yyyy-mm-dd folder if they don't exist
+    FileUtils.mkdir_p(config.old_dir)
 
-# debug
-touch File.join(DESKTOP_DIR, "aaa-#{TIME}.txt") if DEBUG
+    # debug
+    if config.debug
+      FileUtils.touch File.join(config.desktop_dir, "aaa-#{config.time}.txt")
+    end
 
-files = Dir[File.join(DESKTOP_DIR, LS_PATTERN)]
+    files = Dir[File.join(config.desktop_dir, config.ls_pattern)]
 
-# create old yyyy-mm-dd sub folder if it doesn't exist
-mkdir_p(File.join(OLD_DIR, OLD_DIR_DAY_FOLDER)) if files
+    # create old yyyy-mm-dd sub folder if it doesn't exist
+    FileUtils.mkdir_p(File.join(config.old_dir, config.old_sub_folder)) if files
 
-files.each do |file|
-  fname = File.basename(file)
-  fdest = File.join(OLD_DIR, OLD_DIR_DAY_FOLDER, fname)
+    files.each do |file|
+      fname = File.basename(file)
+      fdest = File.join(config.old_dir, config.old_sub_folder, fname)
 
-  # check time
-  st = File.stat(file)
-  next unless st.mtime < (TIME - (FILE_AGE_MIN * 60))
+      # check time
+      st = File.stat(file)
+      next unless st.mtime < (config.time - (config.file_age_min * 60))
 
-  if File.exist?(fdest) # add time to filename
-    fname_no_ext = File.basename(fname, File.extname(fname))
-    fdest =
-      File.join(OLD_DIR,
-                OLD_DIR_DAY_FOLDER,
-                "#{fname_no_ext}-#{TIME_STR}#{File.extname(fname)}")
+      if File.exist?(fdest) # add time to filename
+        fname_no_ext = File.basename(fname, File.extname(fname))
+        fdest =
+          File.join(config.old_dir,
+                    config.old_sub_folder,
+                    "#{fname_no_ext}-#{config.time_str}#{File.extname(fname)}")
+      end
+      if config.debug
+        FileUtils.cp(file, fdest)
+      else
+        FileUtils.mv(file, fdest)
+      end
+      puts fdest
+    end
+
+    puts "#{files.size} moved at #{Time.now}"
   end
-  if DEBUG
-    cp(file, fdest)
-  else
-    mv(file, fdest)
-  end
-  puts fdest
 end
-
-puts "#{files.size} moved at #{Time.now}"
+TidyDesktop.run!
